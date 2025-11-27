@@ -1,42 +1,91 @@
+import { useState, useEffect } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Gift, TrendingUp, Star, ShoppingBag } from "lucide-react";
+import { cashbackService } from "@/services/cashbackService";
 
 const Cashback = () => {
-  const totalCashback = 247.50;
-  const nextReward = 500;
-  const progress = (totalCashback / nextReward) * 100;
+//   const totalCashback = 247.50;
+//   const nextReward = 500;
+//   const progress = (totalCashback / nextReward) * 100;
+//
+//   const offers = [
+//     {
+//       store: "Amazon",
+//       cashback: "5%",
+//       category: "Eletrônicos",
+//       icon: ShoppingBag,
+//       color: "bg-blue-500/10 text-blue-600"
+//     },
+//     {
+//       store: "Magazine Luiza",
+//       cashback: "3%",
+//       category: "Casa e Decoração",
+//       icon: ShoppingBag,
+//       color: "bg-purple-500/10 text-purple-600"
+//     },
+//     {
+//       store: "iFood",
+//       cashback: "10%",
+//       category: "Alimentação",
+//       icon: ShoppingBag,
+//       color: "bg-red-500/10 text-red-600"
+//     },
+//     {
+//         store: "Netshoes",
+//         cashback: "4%",
+//         category: "Esportes",
+//         icon: ShoppingBag,
+//         color: "bg-green-500/10 text-green-600"
+//     },
+//     {
+//         store: "Submarino",
+//         cashback: "6%",
+//         category: "Livros e Mídia",
+//         icon: ShoppingBag,
+//         color: "bg-yellow-500/10 text-yellow-600"
+//     }
+//   ];
+//
+//   const history = [
+//     { store: "Amazon", date: "20/11/2025", amount: "R$ 12,50", status: "confirmed" },
+//     { store: "iFood", date: "18/11/2025", amount: "R$ 8,90", status: "confirmed" },
+//     { store: "Magazine Luiza", date: "15/11/2025", amount: "R$ 15,30", status: "pending" },
+//   ];
 
-  const offers = [
-    { 
-      store: "Amazon", 
-      cashback: "5%", 
-      category: "Eletrônicos",
-      icon: ShoppingBag,
-      color: "bg-blue-500/10 text-blue-600"
-    },
-    { 
-      store: "Magazine Luiza", 
-      cashback: "3%", 
-      category: "Casa e Decoração",
-      icon: ShoppingBag,
-      color: "bg-purple-500/10 text-purple-600"
-    },
-    { 
-      store: "iFood", 
-      cashback: "10%", 
-      category: "Alimentação",
-      icon: ShoppingBag,
-      color: "bg-red-500/10 text-red-600"
-    },
-  ];
+    const [totalCashback, setTotalCashback] = useState(0);
+    const [nextReward, setNextReward] = useState(500);
+    const [offers, setOffers] = useState([]);
+    const [history, setHistory] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-  const history = [
-    { store: "Amazon", date: "20/11/2025", amount: "R$ 12,50", status: "confirmed" },
-    { store: "iFood", date: "18/11/2025", amount: "R$ 8,90", status: "confirmed" },
-    { store: "Magazine Luiza", date: "15/11/2025", amount: "R$ 15,30", status: "pending" },
-  ];
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const [cashbackData, offersData, historyData] = await Promise.all([
+                    cashbackService.getCashbackData(),
+                    cashbackService.getOffers(),
+                    cashbackService.getHistory()
+                ]);
+
+                setTotalCashback(cashbackData.balance);
+                setNextReward(cashbackData.nextReward);
+                setOffers(offersData);
+                setHistory(historyData);
+            } catch (error) {
+                console.error('Erro ao carregar dados:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, []);
+
+    const progress = (totalCashback / nextReward) * 100;
+
+    // if (loading) return <div>Carregando...</div>;
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
@@ -56,7 +105,7 @@ const Cashback = () => {
               <Gift size={32} />
             </div>
           </div>
-          
+
           <Button className="w-full bg-white text-primary hover:bg-white/90">
             Resgatar Cashback
           </Button>

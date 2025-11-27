@@ -36,3 +36,36 @@ class CategorySummaryItem(BaseModel):
 
 class CategorySummaryList(BaseModel):
     categories: List[CategorySummaryItem]
+
+# Schemas para Spending
+class BudgetSummary(BaseModel):
+    total_spent: float
+    budget_limit: float
+    percentage_used: float
+    remaining: float
+    is_over_budget: bool
+
+class DailyStats(BaseModel):
+    spent_today: float
+    today_change: float
+    daily_average: float
+    average_change: float
+    highest_category: str
+    highest_amount: float
+
+class SpendingOverview(BaseModel):
+    budget: BudgetSummary
+    daily_stats: DailyStats
+    categories: List[CategorySummaryItem]
+
+class StatementTransaction(BaseModel):
+    id: str
+    title: str
+    date: str
+    amount: float
+    positive: bool
+    category_type: str
+    description: Optional[str] = None
+
+class StatementResponse(BaseModel):
+    transactions: List[StatementTransaction]

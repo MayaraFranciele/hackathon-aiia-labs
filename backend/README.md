@@ -26,8 +26,8 @@ my-fastapi-app
 
 1. **Crie um ambiente virtual (opcional, mas recomendado):**
 ```bash
-python -m venv venv
-source venv/bin/activate  # Linux/Mac
+python -m venv .venv
+source .venv/bin/activate  # Linux/Mac
 ```
 
 

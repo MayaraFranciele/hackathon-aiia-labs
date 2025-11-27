@@ -1,143 +1,102 @@
+import { useState, useEffect } from "react";
 import { CategorizedTransaction } from "@/components/CategorizedTransaction";
 import { categories } from "@/utils/categories";
-import { TrendingUp, CreditCard, Search } from "lucide-react";
+import { TrendingUp, CreditCard } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { statementService } from "@/services/statementService";
 
 const Statement = () => {
-  const allTransactions = [
-    {
-      icon: TrendingUp,
-      title: "Salário - Empresa XYZ",
-      date: "Hoje, 14:30",
-      amount: "R$ 5.000,00",
-      positive: true,
-      category: categories.utilities,
-    },
-    {
-      icon: CreditCard,
-      title: "Netflix - Assinatura Mensal",
-      date: "Ontem, 18:45",
-      amount: "R$ 55,90",
-      positive: false,
-      category: categories.entertainment,
-    },
-    {
-      icon: categories.food.icon,
-      title: "Restaurante - Jantar",
-      date: "Ontem, 20:30",
-      amount: "R$ 127,50",
-      positive: false,
-      category: categories.food,
-    },
-    {
-      icon: categories.transport.icon,
-      title: "Uber - Corrida",
-      date: "15/11/2025, 08:15",
-      amount: "R$ 32,00",
-      positive: false,
-      category: categories.transport,
-    },
-    {
-      icon: categories.shopping.icon,
-      title: "Amazon - Compras Online",
-      date: "15/11/2025, 14:22",
-      amount: "R$ 245,90",
-      positive: false,
-      category: categories.shopping,
-    },
-    {
-      icon: categories.health.icon,
-      title: "Farmácia - Medicamentos",
-      date: "14/11/2025, 11:30",
-      amount: "R$ 89,90",
-      positive: false,
-      category: categories.health,
-    },
-    {
-      icon: TrendingUp,
-      title: "Rendimento - Investimentos",
-      date: "13/11/2025, 09:00",
-      amount: "R$ 320,00",
-      positive: true,
-      category: categories.utilities,
-    },
-  ];
+	const [transactions, setTransactions] = useState<any[]>([]);
+	const [loading, setLoading] = useState(true);
 
-  return (
-    <div className="max-w-7xl mx-auto space-y-8">
-      <div className="space-y-2">
-        <h1 className="text-3xl lg:text-4xl font-bold">Extrato Completo</h1>
-        <p className="text-muted-foreground">Visualização detalhada de todas as transações</p>
-      </div>
+	useEffect(() => {
+		const fetchTransactions = async () => {
+			try {
+				const data = await statementService.getTransactions();
+				setTransactions(data.transactions);
+			} catch (error) {
+				console.error('Erro ao carregar transações:', error);
+			} finally {
+				setLoading(false);
+			}
+		};
 
-      <Card className="p-6">
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
-            <Input placeholder="Buscar transação..." className="pl-10" />
-          </div>
-          <Select defaultValue="all">
-            <SelectTrigger className="w-full md:w-[200px]">
-              <SelectValue placeholder="Categoria" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todas categorias</SelectItem>
-              <SelectItem value="food">Alimentação</SelectItem>
-              <SelectItem value="transport">Transporte</SelectItem>
-              <SelectItem value="shopping">Compras</SelectItem>
-              <SelectItem value="entertainment">Entretenimento</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select defaultValue="month">
-            <SelectTrigger className="w-full md:w-[200px]">
-              <SelectValue placeholder="Período" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="week">Última semana</SelectItem>
-              <SelectItem value="month">Este mês</SelectItem>
-              <SelectItem value="3months">Últimos 3 meses</SelectItem>
-              <SelectItem value="year">Este ano</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </Card>
+		fetchTransactions();
+	}, []);
 
-      <Card className="p-6">
-        <Tabs defaultValue="all" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-6">
-            <TabsTrigger value="all">Todas</TabsTrigger>
-            <TabsTrigger value="income">Receitas</TabsTrigger>
-            <TabsTrigger value="expenses">Despesas</TabsTrigger>
-          </TabsList>
+	const formatCurrency = (value: number) => {
+		return new Intl.NumberFormat('pt-BR', {
+			style: 'currency',
+			currency: 'BRL'
+		}).format(value);
+	};
 
-          <TabsContent value="all" className="space-y-2">
-            {allTransactions.map((transaction, index) => (
-              <CategorizedTransaction key={index} {...transaction} />
-            ))}
-          </TabsContent>
+	// Calcular estatísticas no frontend
+	const totalIncome = transactions
+		.filter(t => t.positive)
+		.reduce((sum, t) => sum + t.amount, 0);
 
-          <TabsContent value="income" className="space-y-2">
-            {allTransactions
-              .filter((t) => t.positive)
-              .map((transaction, index) => (
-                <CategorizedTransaction key={index} {...transaction} />
-              ))}
-          </TabsContent>
+	const totalExpenses = transactions
+		.filter(t => !t.positive)
+		.reduce((sum, t) => sum + t.amount, 0);
 
-          <TabsContent value="expenses" className="space-y-2">
-            {allTransactions
-              .filter((t) => !t.positive)
-              .map((transaction, index) => (
-                <CategorizedTransaction key={index} {...transaction} />
-              ))}
-          </TabsContent>
-        </Tabs>
-      </Card>
-    </div>
-  );
+	if (loading) {
+		return (
+			<div className="flex items-center justify-center h-screen">
+				<p className="text-muted-foreground">Carregando extrato...</p>
+			</div>
+		);
+	}
+
+	return (
+		<div className="max-w-7xl mx-auto space-y-8">
+			<div className="space-y-2">
+				<h1 className="text-3xl lg:text-4xl font-bold">Extrato Completo</h1>
+				<p className="text-muted-foreground">Visualização detalhada de todas as transações</p>
+			</div>
+
+			<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+				<Card className="p-4">
+					<p className="text-sm text-muted-foreground mb-1">Total de Transações</p>
+					<p className="text-2xl font-bold">{transactions.length}</p>
+				</Card>
+				<Card className="p-4 border-green-500/20 bg-green-500/5">
+					<p className="text-sm text-muted-foreground mb-1">Total Receitas</p>
+					<p className="text-2xl font-bold text-green-600">{formatCurrency(totalIncome)}</p>
+				</Card>
+				<Card className="p-4 border-red-500/20 bg-red-500/5">
+					<p className="text-sm text-muted-foreground mb-1">Total Despesas</p>
+					<p className="text-2xl font-bold text-red-600">{formatCurrency(totalExpenses)}</p>
+				</Card>
+			</div>
+
+			<Card className="p-6">
+				<h2 className="text-xl font-bold mb-6">Todas as Transações</h2>
+				<div className="space-y-2">
+					{transactions.length === 0 ? (
+						<div className="text-center py-8">
+							<p className="text-muted-foreground">Nenhuma transação encontrada</p>
+						</div>
+					) : (
+						transactions.map((transaction) => {
+							const category = categories[transaction.category_type as keyof typeof categories];
+							return (
+								<CategorizedTransaction
+									key={transaction.id}
+									icon={transaction.positive ? TrendingUp : category?.icon || CreditCard}
+									title={transaction.title}
+									date={transaction.date}
+									amount={formatCurrency(transaction.amount)}
+									positive={transaction.positive}
+									category={category}
+								/>
+							);
+						})
+					)}
+				</div>
+			</Card>
+		</div>
+	);
 };
 
 export default Statement;

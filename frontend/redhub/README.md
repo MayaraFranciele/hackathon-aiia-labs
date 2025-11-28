@@ -90,4 +90,3 @@ Este projeto está licenciado sob a licença MIT. Sinta-se à vontade para usá-
 ---
 
 **RedHub** - Gerencie suas finanças de forma inteligente e prática!
-

@@ -8,6 +8,9 @@ import {
   ShoppingBag,
   Shield,
   Landmark,
+  Moon,
+  Sun,
+  Wallet ,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import {
@@ -37,34 +40,42 @@ const servicesItems = [
   { title: "Empréstimos", url: "/loans", icon: Landmark },
 ];
 
-export function AppSidebar() {
+interface AppSidebarProps {
+  isDarkMode: boolean;
+  toggleDarkMode: () => void;
+}
+
+export function AppSidebar({ isDarkMode, toggleDarkMode }: AppSidebarProps) {
   const { state } = useSidebar();
   const isCollapsed = state === "collapsed";
 
   return (
-    <Sidebar collapsible="icon">
+    <Sidebar
+      collapsible="icon"
+      className="group will-change-transform"
+    >
       <SidebarContent className="flex flex-col h-full">
-        {/* Logo */}
-        <div className="px-4 py-5 border-b border-sidebar-border">
-          {!isCollapsed ? (
-            <>
-              <h1 className="text-2xl font-bold text-sidebar-primary">
-                RedHub
-              </h1>
-              <p className="text-sm text-sidebar-foreground/60 mt-1">
-                Seu hub financeiro
-              </p>
-            </>
-          ) : (
-            <div className="flex items-center justify-center w-full">
-              <div className="w-10 h-10 rounded-full bg-sidebar-accent flex items-center justify-center">
-                <span className="font-bold text-sidebar-primary">RH</span>
-              </div>
-            </div>
-          )}
+
+        <div className="px-4 py-5 border-b border-sidebar-border flex items-center justify-center">
+          <div className="flex items-center justify-center w-full">
+            <span
+              className={`text-2xl font-bold text-sidebar-primary transition-opacity duration-200 ${
+                isCollapsed ? "opacity-0 absolute" : "opacity-100"
+              }`}
+            >
+              RedHub
+            </span>
+            
+            <Wallet className="w-7 h-7 text-sidebar-primary" />
+
+            {isCollapsed && (
+              <span className="font-bold text-xl text-sidebar-primary">
+                RH
+              </span>
+            )}
+          </div>
         </div>
 
-        {/* Main Navigation */}
         <SidebarGroup>
           <SidebarGroupLabel>Principal</SidebarGroupLabel>
           <SidebarGroupContent>
@@ -75,11 +86,11 @@ export function AppSidebar() {
                     <NavLink
                       to={item.url}
                       end
-                      className="hover:bg-sidebar-accent"
+                      className="flex items-center gap-3 hover:bg-sidebar-accent transition-colors"
                       activeClassName="bg-sidebar-accent text-sidebar-primary font-medium"
                     >
                       <item.icon />
-                      <span>{item.title}</span>
+                      {!isCollapsed && <span>{item.title}</span>}
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -88,7 +99,6 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* Services */}
         <SidebarGroup>
           <SidebarGroupLabel>Serviços</SidebarGroupLabel>
           <SidebarGroupContent>
@@ -98,11 +108,11 @@ export function AppSidebar() {
                   <SidebarMenuButton asChild tooltip={item.title}>
                     <NavLink
                       to={item.url}
-                      className="hover:bg-sidebar-accent"
+                      className="flex items-center gap-3 hover:bg-sidebar-accent transition-colors"
                       activeClassName="bg-sidebar-accent text-sidebar-primary font-medium"
                     >
                       <item.icon />
-                      <span>{item.title}</span>
+                      {!isCollapsed && <span>{item.title}</span>}
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -111,9 +121,39 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* User info */}
+        <div className="mt-auto px-4 pb-3">
+          <button
+            onClick={toggleDarkMode}
+            aria-label="Alternar tema"
+            className={`
+              w-full flex items-center gap-3 py-3 rounded-xl
+              ${isCollapsed ? "justify-center bg-transparent" : "justify-start bg-sidebar-accent hover:bg-sidebar-accent/80 px-4"}
+              transition-colors
+            `}
+          >
+            <div
+              className="transition-transform duration-300"
+              style={{
+                transform: isDarkMode ? "rotate(180deg)" : "rotate(0deg)",
+              }}
+            >
+              {isDarkMode ? (
+                <Sun className="h-5 w-5" />
+              ) : (
+                <Moon className="h-5 w-5" />
+              )}
+            </div>
+
+            {!isCollapsed && (
+              <span className="text-sm font-medium">
+                {isDarkMode ? "Modo Claro" : "Modo Escuro"}
+              </span>
+            )}
+          </button>
+        </div>
+
         {!isCollapsed && (
-          <div className="mt-auto p-4 border-t border-sidebar-border">
+          <div className="p-4 border-t border-sidebar-border">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-gradient-primary flex items-center justify-center text-white font-bold">
                 U
@@ -129,6 +169,7 @@ export function AppSidebar() {
             </div>
           </div>
         )}
+
       </SidebarContent>
     </Sidebar>
   );

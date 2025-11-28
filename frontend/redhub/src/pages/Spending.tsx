@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { StatCard } from "@/components/StatCard";
 import { CategorySummary } from "@/components/CategorySummary";
 import { categories } from "@/utils/categories";
-import { TrendingDown, TrendingUp, Wallet, AlertCircle } from "lucide-react";
+import { TrendingDown, Wallet, AlertCircle } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 

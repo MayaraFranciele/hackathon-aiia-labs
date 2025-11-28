@@ -3,15 +3,28 @@ import { QuickAction } from "@/components/QuickAction";
 import { CategorizedTransaction } from "@/components/CategorizedTransaction";
 import { CategorySummary } from "@/components/CategorySummary";
 import { categories } from "@/utils/categories";
-import { Wallet, TrendingUp, TrendingDown, Send, Download, CreditCard, Smartphone } from "lucide-react";
+import {
+  Wallet,
+  TrendingUp,
+  TrendingDown,
+  Send,
+  Download,
+  CreditCard,
+  Smartphone,
+  Sparkles
+} from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Index = () => {
+  const userName = "Mayara";
+
   return (
     <div className="max-w-7xl mx-auto space-y-8">
       <div className="space-y-2">
         <h1 className="text-3xl lg:text-4xl font-bold">Dashboard</h1>
-        <p className="text-muted-foreground">Bem-vindo ao seu hub financeiro!</p>
+        <p className="text-muted-foreground">
+          Olá {userName}, seja bem-vindo(a) ao seu Hub Financeiro!
+        </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
@@ -52,11 +65,20 @@ const Index = () => {
       <div className="bg-card rounded-xl border border-border p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-xl font-bold">Extrato Inteligente</h2>
+            <div className="flex items-center gap-3">
+              <h2 className="text-xl font-bold">Extrato Inteligente</h2>
+
+              <span className="flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full bg-primary/10 text-primary border border-primary/20">
+                <Sparkles className="w-3 h-3" />
+                IA Ativa
+              </span>
+            </div>
+
             <p className="text-sm text-muted-foreground mt-1">
-              Suas despesas categorizadas automaticamente
+              Suas despesas categorizadas automaticamente por inteligência artificial
             </p>
           </div>
+
           <button className="text-sm text-primary hover:underline font-medium">
             Ver todas
           </button>
@@ -64,8 +86,8 @@ const Index = () => {
 
         <Tabs defaultValue="transactions" className="w-full">
           <TabsList className="grid w-full grid-cols-2 mb-6">
-            <TabsTrigger value="transactions">Transações</TabsTrigger>
-            <TabsTrigger value="categories">Por Categoria</TabsTrigger>
+            <TabsTrigger value="transactions" tabIndex={0}>Transações</TabsTrigger>
+            <TabsTrigger value="categories" tabIndex={0}>Por Categoria</TabsTrigger>
           </TabsList>
 
           <TabsContent value="transactions" className="space-y-2">

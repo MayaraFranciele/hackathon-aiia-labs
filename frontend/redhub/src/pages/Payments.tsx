@@ -4,18 +4,48 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Scan, FileText, Calendar, AlertCircle } from "lucide-react";
 
+const ENERGY_AMOUNT = "R$ 195,00";
+const INTERNET_AMOUNT = "R$ 99,90";
+const WATER_AMOUNT = "R$ 67,50";
+const NETFLIX_AMOUNT = "R$ 55,90";
+const SPOTIFY_AMOUNT = "R$ 21,90";
+
+const upcomingBillsMock = [
+  {
+    name: "Energia Elétrica",
+    dueDate: "25/11/2025",
+    amount: ENERGY_AMOUNT,
+    status: "pending",
+  },
+  {
+    name: "Internet",
+    dueDate: "28/11/2025",
+    amount: INTERNET_AMOUNT,
+    status: "pending",
+  },
+  {
+    name: "Água",
+    dueDate: "30/11/2025",
+    amount: WATER_AMOUNT,
+    status: "pending",
+  },
+];
+
+const paidBillsMock = [
+  {
+    name: "Netflix",
+    paidDate: "20/11/2025",
+    amount: NETFLIX_AMOUNT,
+  },
+  {
+    name: "Spotify",
+    paidDate: "18/11/2025",
+    amount: SPOTIFY_AMOUNT,
+  },
+];
+
+
 const Payments = () => {
-  const upcomingBills = [
-    { name: "Energia Elétrica", dueDate: "25/11/2025", amount: "R$ 185,00", status: "pending" },
-    { name: "Internet", dueDate: "28/11/2025", amount: "R$ 99,90", status: "pending" },
-    { name: "Água", dueDate: "30/11/2025", amount: "R$ 67,50", status: "pending" },
-  ];
-
-  const paidBills = [
-    { name: "Netflix", paidDate: "20/11/2025", amount: "R$ 55,90" },
-    { name: "Spotify", paidDate: "18/11/2025", amount: "R$ 21,90" },
-  ];
-
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       <div className="space-y-2">
@@ -42,7 +72,7 @@ const Payments = () => {
           </TabsList>
 
           <TabsContent value="upcoming" className="space-y-3">
-            {upcomingBills.map((bill, index) => (
+            {upcomingBillsMock.map((bill, index) => (
               <div
                 key={index}
                 className="flex items-center justify-between p-4 rounded-lg border hover:border-primary transition-colors"
@@ -55,7 +85,9 @@ const Payments = () => {
                     <p className="font-medium text-sm">{bill.name}</p>
                     <div className="flex items-center gap-2 mt-1">
                       <Calendar size={14} className="text-muted-foreground" />
-                      <p className="text-xs text-muted-foreground">Vencimento: {bill.dueDate}</p>
+                      <p className="text-xs text-muted-foreground">
+                        Vencimento: {bill.dueDate}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -67,19 +99,19 @@ const Payments = () => {
                 </div>
               </div>
             ))}
-            
-            {upcomingBills.length > 0 && (
+
+            {upcomingBillsMock.length > 0 && (
               <div className="flex items-center gap-2 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 mt-4">
                 <AlertCircle size={20} className="text-amber-600" />
                 <p className="text-sm font-medium text-amber-600">
-                  Você tem {upcomingBills.length} contas a vencer este mês
+                  Você tem {upcomingBillsMock.length} contas a vencer este mês
                 </p>
               </div>
             )}
           </TabsContent>
 
           <TabsContent value="paid" className="space-y-3">
-            {paidBills.map((bill, index) => (
+            {paidBillsMock.map((bill, index) => (
               <div
                 key={index}
                 className="flex items-center justify-between p-4 rounded-lg border"
@@ -90,10 +122,14 @@ const Payments = () => {
                   </div>
                   <div>
                     <p className="font-medium text-sm">{bill.name}</p>
-                    <p className="text-xs text-muted-foreground">Pago em: {bill.paidDate}</p>
+                    <p className="text-xs text-muted-foreground">
+                      Pago em: {bill.paidDate}
+                    </p>
                   </div>
                 </div>
-                <p className="font-bold text-sm text-success">{bill.amount}</p>
+                <p className="font-bold text-sm text-success">
+                  {bill.amount}
+                </p>
               </div>
             ))}
           </TabsContent>

@@ -6,6 +6,37 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { QrCode, Send, Download, Copy, Clock } from "lucide-react";
 import { toast } from "sonner";
 
+const pixKeys = [
+  {
+    type: "CPF",
+    value: "***.***.***-**",
+  },
+  {
+    type: "E-mail",
+    value: "usuario@email.com",
+  },
+];
+
+const recentPix = [
+  {
+    name: "João Silva",
+    time: "Há 2 horas",
+    amount: 160.0,
+  },
+  {
+    name: "Maria Santos",
+    time: "Ontem",
+    amount: 80.0,
+  },
+  {
+    name: "Pedro Costa",
+    time: "2 dias atrás",
+    amount: 200.0,
+  },
+];
+
+const pixQrCodeValue = "PIX_QR_CODE_MOCK";
+
 const Pix = () => {
   const handleCopyKey = () => {
     toast.success("Chave PIX copiada!");
@@ -25,18 +56,21 @@ const Pix = () => {
           </div>
           <span className="font-medium text-sm text-center">Enviar PIX</span>
         </Card>
+
         <Card className="p-6 flex flex-col items-center gap-3 hover:border-primary transition-colors cursor-pointer">
           <div className="p-4 rounded-full bg-primary/10">
             <Download size={24} className="text-primary" />
           </div>
           <span className="font-medium text-sm text-center">Receber PIX</span>
         </Card>
+
         <Card className="p-6 flex flex-col items-center gap-3 hover:border-primary transition-colors cursor-pointer">
           <div className="p-4 rounded-full bg-primary/10">
             <QrCode size={24} className="text-primary" />
           </div>
           <span className="font-medium text-sm text-center">QR Code</span>
         </Card>
+
         <Card className="p-6 flex flex-col items-center gap-3 hover:border-primary transition-colors cursor-pointer">
           <div className="p-4 rounded-full bg-primary/10">
             <Copy size={24} className="text-primary" />
@@ -56,13 +90,19 @@ const Pix = () => {
             <div className="space-y-4">
               <div>
                 <Label htmlFor="pixKey">Chave PIX ou dados do destinatário</Label>
-                <Input id="pixKey" placeholder="CPF, CNPJ, E-mail, Telefone ou Chave Aleatória" className="mt-2" />
+                <Input
+                  id="pixKey"
+                  placeholder="CPF, CNPJ, E-mail, Telefone ou Chave Aleatória"
+                  className="mt-2"
+                />
               </div>
-              
+
               <div>
                 <Label htmlFor="amount">Valor</Label>
                 <div className="relative mt-2">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">R$</span>
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                    R$
+                  </span>
                   <Input id="amount" type="number" placeholder="0,00" className="pl-10" />
                 </div>
               </div>
@@ -88,24 +128,20 @@ const Pix = () => {
               <div>
                 <Label>Suas Chaves PIX</Label>
                 <div className="space-y-2 mt-2">
-                  <div className="flex items-center justify-between p-3 rounded-lg border">
-                    <div>
-                      <p className="font-medium text-sm">CPF</p>
-                      <p className="text-xs text-muted-foreground">***.***.***-**</p>
+                  {pixKeys.map((key, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center justify-between p-3 rounded-lg border"
+                    >
+                      <div>
+                        <p className="font-medium text-sm">{key.type}</p>
+                        <p className="text-xs text-muted-foreground">{key.value}</p>
+                      </div>
+                      <Button variant="ghost" size="sm" onClick={handleCopyKey}>
+                        <Copy size={16} />
+                      </Button>
                     </div>
-                    <Button variant="ghost" size="sm" onClick={handleCopyKey}>
-                      <Copy size={16} />
-                    </Button>
-                  </div>
-                  <div className="flex items-center justify-between p-3 rounded-lg border">
-                    <div>
-                      <p className="font-medium text-sm">E-mail</p>
-                      <p className="text-xs text-muted-foreground">usuario@email.com</p>
-                    </div>
-                    <Button variant="ghost" size="sm" onClick={handleCopyKey}>
-                      <Copy size={16} />
-                    </Button>
-                  </div>
+                  ))}
                 </div>
               </div>
             </div>
@@ -118,18 +154,20 @@ const Pix = () => {
           <h2 className="text-xl font-bold">PIX Recentes</h2>
           <Clock size={20} className="text-muted-foreground" />
         </div>
+
         <div className="space-y-3">
-          {[
-            { name: "João Silva", time: "Há 2 horas", amount: "R$ 150,00" },
-            { name: "Maria Santos", time: "Ontem", amount: "R$ 80,00" },
-            { name: "Pedro Costa", time: "2 dias atrás", amount: "R$ 200,00" },
-          ].map((pix, index) => (
-            <div key={index} className="flex items-center justify-between p-3 rounded-lg hover:bg-muted/50 transition-colors">
+          {recentPix.map((pix, index) => (
+            <div
+              key={index}
+              className="flex items-center justify-between p-3 rounded-lg hover:bg-muted/50 transition-colors"
+            >
               <div>
                 <p className="font-medium text-sm">{pix.name}</p>
                 <p className="text-xs text-muted-foreground">{pix.time}</p>
               </div>
-              <span className="font-bold text-sm">-{pix.amount}</span>
+              <span className="font-bold text-sm">
+                - R$ {pix.amount.toFixed(2)}
+              </span>
             </div>
           ))}
         </div>

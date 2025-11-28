@@ -114,7 +114,7 @@ client = genai.Client(api_key="AIzaSyChOR5UTCxt20zVm2xQhUo-m79UhdGFgo4")
 hoje_str = datetime.date.today().strftime("%Y-%m-%d")
 
 chat = client.chats.create(
-    model="gemini-2.5-pro",
+    model="gemini-2.0-flash",
     config=types.GenerateContentConfig(
         tools=[buscar_transacoes], # Aponta para nossa função Python
         automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=False),

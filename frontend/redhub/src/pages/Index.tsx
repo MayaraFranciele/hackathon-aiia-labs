@@ -14,9 +14,101 @@ import {
   Sparkles
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { dashboardService } from "@/services/dashboardServices";
+import { useEffect, useState } from "react";
 
 const Index = () => {
   const userName = "Mayara";
+
+  const [stats, setStats] = useState({
+    balance: {
+      value: "R$ 0,00",
+      change: "+0%",
+      positive: true
+    },
+    income: {
+      value: "R$ 0,00",
+      change: "+0%",
+      positive: true
+    },
+    expenses: {
+      value: "R$ 0,00",
+      change: "0%",
+      positive: false
+    }
+  });
+
+  const [transactions, setTransactions] = useState([]);
+  const [categorySummary, setCategorySummary] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        setLoading(true);
+
+        // Buscar resumo do dashboard
+        const summaryData = await dashboardService.getSummary();
+        setStats({
+          balance: {
+            value: `R$ ${summaryData.total_balance.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+            change: `${summaryData.total_balance_change > 0 ? '+' : ''}${summaryData.total_balance_change}%`,
+            positive: summaryData.total_balance_change >= 0
+          },
+          income: {
+            value: `R$ ${summaryData.total_income.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+            change: `${summaryData.total_income_change > 0 ? '+' : ''}${summaryData.total_income_change}%`,
+            positive: summaryData.total_income_change >= 0
+          },
+          expenses: {
+            value: `R$ ${summaryData.total_expenses.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+            change: `${summaryData.total_expenses_change > 0 ? '+' : ''}${summaryData.total_expenses_change}%`,
+            positive: summaryData.total_expenses_change < 0
+          }
+        });
+
+        // Buscar transações
+        const transactionsData = await dashboardService.getTransactions();
+        const mappedTransactions = transactionsData.transactions.map(t => ({
+          icon: t.positive ? TrendingUp : categories[t.category_type]?.icon || CreditCard,
+          title: t.title,
+          date: t.date,
+          amount: `R$ ${t.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+          positive: t.positive,
+          category: categories[t.category_type] || categories.utilities
+        }));
+        setTransactions(mappedTransactions);
+
+        // Buscar resumo por categoria
+        const categoryData = await dashboardService.getCategorySummary();
+        const mappedCategories = categoryData.categories.map(c => ({
+          icon: categories[c.type]?.icon || CreditCard,
+          label: c.label,
+          amount: `R$ ${c.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+          percentage: c.percentage,
+          color: c.color
+        }));
+        setCategorySummary(mappedCategories);
+
+      } catch (error) {
+        console.error("Erro ao carregar dados do dashboard:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="max-w-7xl mx-auto space-y-8">
+        <div className="flex items-center justify-center h-96">
+          <p className="text-muted-foreground">Carregando...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto space-y-8">
@@ -30,24 +122,24 @@ const Index = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
         <StatCard
           title="Saldo Total"
-          value="R$ 12.450,00"
-          change="+12.5%"
-          positive={true}
+          value={stats.balance.value}
+          change={stats.balance.change}
+          positive={stats.balance.positive}
           icon={Wallet}
           gradient={true}
         />
         <StatCard
           title="Receitas"
-          value="R$ 8.230,00"
-          change="+8.2%"
-          positive={true}
+          value={stats.income.value}
+          change={stats.income.change}
+          positive={stats.income.positive}
           icon={TrendingUp}
         />
         <StatCard
           title="Despesas"
-          value="R$ 3.180,00"
-          change="-3.1%"
-          positive={false}
+          value={stats.expenses.value}
+          change={stats.expenses.change}
+          positive={stats.expenses.positive}
           icon={TrendingDown}
         />
       </div>
@@ -91,100 +183,30 @@ const Index = () => {
           </TabsList>
 
           <TabsContent value="transactions" className="space-y-2">
-            <CategorizedTransaction
-              icon={TrendingUp}
-              title="Salário - Empresa XYZ"
-              date="Hoje, 14:30"
-              amount="R$ 5.000,00"
-              positive={true}
-              category={categories.utilities}
-            />
-            <CategorizedTransaction
-              icon={CreditCard}
-              title="Netflix - Assinatura Mensal"
-              date="Ontem, 18:45"
-              amount="R$ 55,90"
-              positive={false}
-              category={categories.entertainment}
-            />
-            <CategorizedTransaction
-              icon={categories.food.icon}
-              title="Restaurante - Jantar"
-              date="Ontem, 20:30"
-              amount="R$ 127,50"
-              positive={false}
-              category={categories.food}
-            />
-            <CategorizedTransaction
-              icon={categories.transport.icon}
-              title="Uber - Corrida"
-              date="15/11/2025, 08:15"
-              amount="R$ 32,00"
-              positive={false}
-              category={categories.transport}
-            />
-            <CategorizedTransaction
-              icon={categories.shopping.icon}
-              title="Amazon - Compras Online"
-              date="15/11/2025, 14:22"
-              amount="R$ 245,90"
-              positive={false}
-              category={categories.shopping}
-            />
-            <CategorizedTransaction
-              icon={categories.health.icon}
-              title="Farmácia - Medicamentos"
-              date="14/11/2025, 11:30"
-              amount="R$ 89,90"
-              positive={false}
-              category={categories.health}
-            />
-            <CategorizedTransaction
-              icon={TrendingUp}
-              title="Rendimento - Investimentos"
-              date="13/11/2025, 09:00"
-              amount="R$ 320,00"
-              positive={true}
-              category={categories.utilities}
-            />
+            {transactions.map((transaction, index) => (
+              <CategorizedTransaction
+                key={index}
+                icon={transaction.icon}
+                title={transaction.title}
+                date={transaction.date}
+                amount={transaction.amount}
+                positive={transaction.positive}
+                category={transaction.category}
+              />
+            ))}
           </TabsContent>
 
           <TabsContent value="categories" className="space-y-3">
-            <CategorySummary
-              icon={categories.food.icon}
-              label={categories.food.label}
-              amount="R$ 856,40"
-              percentage={27}
-              color={categories.food.color}
-            />
-            <CategorySummary
-              icon={categories.transport.icon}
-              label={categories.transport.label}
-              amount="R$ 512,00"
-              percentage={16}
-              color={categories.transport.color}
-            />
-            <CategorySummary
-              icon={categories.shopping.icon}
-              label={categories.shopping.label}
-              amount="R$ 445,90"
-              percentage={14}
-              color={categories.shopping.color}
-            />
-            <CategorySummary
-              icon={categories.entertainment.icon}
-              label={categories.entertainment.label}
-              amount="R$ 355,90"
-              percentage={11}
-              color={categories.entertainment.color}
-            />
-            <CategorySummary
-              icon={categories.housing.icon}
-              label={categories.housing.label}
-              amount="R$ 980,00"
-              percentage={31}
-              color={categories.housing.color}
-            />
+            {categorySummary.map((category, index) => (
+              <CategorySummary
+                key={index}
+                icon={category.icon}
+                label={category.label}
+                amount={category.amount}
+                percentage={category.percentage}
+                color={category.color}
+              />
+            ))}
           </TabsContent>
         </Tabs>
       </div>

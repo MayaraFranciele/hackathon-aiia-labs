@@ -48,6 +48,13 @@ interface AppSidebarProps {
 export function AppSidebar({ isDarkMode, toggleDarkMode }: AppSidebarProps) {
   const { state } = useSidebar();
   const isCollapsed = state === "collapsed";
+  const userName = "Mayara";
+  const userEmail = "mayara@gmail.com"
+  const userInitials = userName
+  .split(" ")
+  .map((n) => n[0])
+  .join("")
+  .toUpperCase();
 
   return (
     <Sidebar
@@ -65,7 +72,7 @@ export function AppSidebar({ isDarkMode, toggleDarkMode }: AppSidebarProps) {
             >
               RedHub
             </span>
-            
+
             <Wallet className="w-7 h-7 text-sidebar-primary" />
 
             {isCollapsed && (
@@ -156,14 +163,14 @@ export function AppSidebar({ isDarkMode, toggleDarkMode }: AppSidebarProps) {
           <div className="p-4 border-t border-sidebar-border">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-gradient-primary flex items-center justify-center text-white font-bold">
-                U
+                {userInitials}
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-sidebar-foreground truncate">
-                  Usuário
+                  {userName}
                 </p>
                 <p className="text-xs text-sidebar-foreground/60 truncate">
-                  usuario@email.com
+                  {userEmail}
                 </p>
               </div>
             </div>
